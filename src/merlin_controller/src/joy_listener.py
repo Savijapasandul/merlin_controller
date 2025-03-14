@@ -2,69 +2,51 @@
 
 import rospy
 from sensor_msgs.msg import Joy
-import merlin_hw
-import time
 
-time.sleep(1)
+class ButtonStateTracker:
+    def __init__(self):
+        # Track states for buttons 1-10
+        self.prev_button_states = [False] * 10  # Previous state
+        self.curr_button_states = [False] * 10  # Current state
 
-merlin_bot = merlin_hw.robot()
-merlin_bot.start()
+        rospy.init_node('button_state_tracker')
+        rospy.Subscriber('/ps4_controller', Joy, self.joy_callback)
 
-def joy_callback(msg):
-    # Print axes values
-    # for i, axis_value in enumerate(msg.axes):
-    #     print(f"Axis {i}: {axis_value}")
+    def joy_callback(self, msg):
+        # Update button states
+        self.prev_button_states = self.curr_button_states.copy()
+        
+        # Get current states (limit to 10 buttons)
+        for i in range(min(len(msg.buttons), 10)):
+            self.curr_button_states[i] = msg.buttons[i] == 1
 
-    if len(msg.buttons) > 4 and msg.buttons[4] == 1:
-        while msg.buttons[4] == 1:
-            rospy.loginfo("Rotating Left")
-            merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0,left_right_throttle=0,rotate_throttle=1)
-            pygame.event.pump()
-            
-    if len(msg.buttons) > 5 and msg.buttons[5] == 1:
-        while msg.buttons[5] == 1:
-            rospy.loginfo("Rotating Right")
-            pygame.event.pump()
+    def is_pressed(self, button_id):
+        """Check if button is currently pressed (held down)"""
+        return self.curr_button_states[button_id]
 
-    # if len(msg.buttons) > 1 and msg.buttons[1] == 1:
-    #     while msg.buttons[1] == 1:
-    #         rospy.loginfo("Hello World")
-    #         pygame.event.pump()
+    def was_pressed(self, button_id):
+        """Check if button was just pressed (transition from released to pressed)"""
+        return self.curr_button_states[button_id] and not self.prev_button_states[button_id]
 
-    # if len(msg.buttons) > 1 and msg.buttons[1] == 1:
-    #     while msg.buttons[1] == 1:
-    #         rospy.loginfo("Hello World")
-    #         pygame.event.pump()
+    def was_released(self, button_id):
+        """Check if button was just released (transition from pressed to released)"""
+        return not self.curr_button_states[button_id] and self.prev_button_states[button_id]
 
-    # if len(msg.buttons) > 1 and msg.buttons[1] == 1:
-    #     while msg.buttons[1] == 1:
-    #         rospy.loginfo("Hello World")
-    #         pygame.event.pump()
-
-    # if len(msg.buttons) > 1 and msg.buttons[1] == 1:
-    #     while msg.buttons[1] == 1:
-    #         rospy.loginfo("Hello World")
-    #         pygame.event.pump()
-
-    # if len(msg.buttons) > 1 and msg.buttons[1] == 1:
-    #     while msg.buttons[1] == 1:
-    #         rospy.loginfo("Hello World")
-    #         pygame.event.pump()
-
-    # if len(msg.buttons) > 1 and msg.buttons[1] == 1:
-    #     while msg.buttons[1] == 1:
-    #         rospy.loginfo("Hello World")
-    #         pygame.event.pump()
-
-    # if len(msg.buttons) > 1 and msg.buttons[1] == 1:
-    #     while msg.buttons[1] == 1:
-    #         rospy.loginfo("Hello World")
-    #         pygame.event.pump()
+    def run(self):
+        rate = rospy.Rate(10)  # 10 Hz
+        while not rospy.is_shutdown():
+            # Example usage (replace with your own logic)
+            if self.is_pressed(4):  # Button 5 (index 4)
+                print("Button 5: Held down")
+                
+            if self.was_pressed(5):  # Button 6 (index 5)
+                print("Button 6: Just pressed")
+                
+            if self.was_released(6):  # Button 7 (index 6)
+                print("Button 7: Just released")
+                
+            rate.sleep()
 
 if __name__ == '__main__':
-    try:
-        rospy.init_node('ps4_controller_listener', anonymous=True)
-        rospy.Subscriber('/ps4_controller', Joy, joy_callback)
-        rospy.spin()
-    except rospy.ROSInterruptException:
-        pass
+    tracker = ButtonStateTracker()
+    tracker.run()

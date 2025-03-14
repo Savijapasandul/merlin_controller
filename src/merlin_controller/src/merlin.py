@@ -2,10 +2,10 @@
 
 import rospy
 from sensor_msgs.msg import Joy
-import merlin_hw
+# import merlin_hw
 
-merlin_bot = merlin_hw.robot()
-merlin_bot.start()
+# merlin_bot = merlin_hw.robot()
+# merlin_bot.start()
 
 def joy_callback(msg):
 
@@ -16,50 +16,50 @@ def joy_callback(msg):
     
     if fwd_bwd_throttle == -1.0 and left_right_throttle == -1.0:
         #merlin_bot.set_velocity_throttle(fwd_bwd_throttle=1,left_right_throttle=1,rotate_throttle=0)
-        rospy.loginfo("Moving Forward-Left")
+        print("Moving Forward-Left")
     elif fwd_bwd_throttle == -1.0 and left_right_throttle == 0.999969482421875:
         #merlin_bot.set_velocity_throttle(fwd_bwd_throttle=1,left_right_throttle=-1,rotate_throttle=0)
-        rospy.loginfo("Moving Forward-Right")
+        print("Moving Forward-Right")
     elif fwd_bwd_throttle == 0.999969482421875 and left_right_throttle == -1.0:
         #merlin_bot.set_velocity_throttle(fwd_bwd_throttle=-1,left_right_throttle=1,rotate_throttle=0)
-        rospy.loginfo("Moving Backward-Left")
+        print("Moving Backward-Left")
     elif fwd_bwd_throttle == 0.999969482421875 and left_right_throttle == 0.999969482421875:
         #merlin_bot.set_velocity_throttle(fwd_bwd_throttle=-1,left_right_throttle=-1,rotate_throttle=0)
-        rospy.loginfo("Moving Backward-Right")
+        print("Moving Backward-Right")
     elif fwd_bwd_throttle == -1.0:
         #merlin_bot.set_velocity_throttle(fwd_bwd_throttle=1,left_right_throttle=0,rotate_throttle=0)
-        rospy.loginfo("Moving Forward")
+        print("Moving Forward")
     elif fwd_bwd_throttle == 0.999969482421875:
         #merlin_bot.set_velocity_throttle(fwd_bwd_throttle=-1,left_right_throttle=0,rotate_throttle=0)
-        rospy.loginfo("Moving Backward")
+        print("Moving Backward")
     elif left_right_throttle == -1.0:
         #merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0,left_right_throttle=1,rotate_throttle=0)
-        rospy.loginfo("Moving Left")
+        print("Moving Left")
     elif left_right_throttle == 0.999969482421875:
         #merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0,left_right_throttle=-1,rotate_throttle=0)
-        rospy.loginfo("Moving Right")
+        print("Moving Right")
     elif buttons[4] == 1:
-        rospy.loginfo("Rotating Left")
-        merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0,left_right_throttle=0,rotate_throttle=1)
+        print("Rotating Left")
+        # merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0,left_right_throttle=0,rotate_throttle=1)
     elif buttons[5] == 1:
-        rospy.loginfo("Rotating Right")
-        merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0,left_right_throttle=0,rotate_throttle=-1)
+        print("Rotating Right")
+        # merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0,left_right_throttle=0,rotate_throttle=-1)
     elif buttons[0] == 1:
-        rospy.loginfo("0R")
+        print("0R")
     elif buttons[2] == 1:
-        rospy.loginfo("0R")
+        print("0R")
     elif buttons[1] == 1:
-        rospy.loginfo("1R")
+        print("1R")
     elif buttons[3] == 1:
-        rospy.loginfo("1R")
+        print("1R")
     elif buttons[6] == 1:
-        rospy.loginfo("2R")
+        print("2R")
     elif buttons[7] == 1:
-        rospy.loginfo("2R")
+        print("2R")
     elif buttons[9] == 1:
-        rospy.loginfo("gripper open")
+        print("gripper open")
     elif buttons[10] == 1:
-        rospy.loginfo("gripper close")
+        print("gripper close")
     else:
         #merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0,left_right_throttle=0,rotate_throttle=0)
         pass
@@ -72,7 +72,7 @@ def joy_callback(msg):
 if __name__ == '__main__':
     rospy.init_node('ps4_controller_listener', anonymous=True)    
     rospy.Subscriber('/ps4_controller', Joy, joy_callback)
-    rospy.loginfo("Received joystick input, pls move joystick to start")
+    print("Received joystick input, pls move joystick to start")
     
     try:
         rospy.spin()
