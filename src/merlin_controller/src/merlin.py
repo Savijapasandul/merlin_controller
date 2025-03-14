@@ -73,5 +73,8 @@ if __name__ == '__main__':
     rospy.init_node('ps4_controller_listener', anonymous=True)    
     rospy.Subscriber('/ps4_controller', Joy, joy_callback)
     rospy.loginfo("Received joystick input, pls move joystick to start")
-
-    rospy.spin()
+    
+    try:
+        rospy.spin()
+    except rospy.ROSInterruptException:
+        pass
