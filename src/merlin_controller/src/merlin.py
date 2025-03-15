@@ -2,79 +2,45 @@
 
 import rospy
 from sensor_msgs.msg import Joy
+
 # import merlin_hw
 
 # merlin_bot = merlin_hw.robot()
 # merlin_bot.start()
 
-def joy_callback(msg):
+class ButtonActionHandler:
+    def __init__(self):
+        # Track button states (buttons 1-10)
+        self.button_states = [False] * 10
 
-    buttons = msg.buttons
-    axes = msg.axes
-    fwd_bwd_throttle = axes[1]
-    left_right_throttle = axes[0]
-    
-    if fwd_bwd_throttle == -1.0 and left_right_throttle == -1.0:
-        #merlin_bot.set_velocity_throttle(fwd_bwd_throttle=1,left_right_throttle=1,rotate_throttle=0)
-        print("Moving Forward-Left")
-    elif fwd_bwd_throttle == -1.0 and left_right_throttle == 0.999969482421875:
-        #merlin_bot.set_velocity_throttle(fwd_bwd_throttle=1,left_right_throttle=-1,rotate_throttle=0)
-        print("Moving Forward-Right")
-    elif fwd_bwd_throttle == 0.999969482421875 and left_right_throttle == -1.0:
-        #merlin_bot.set_velocity_throttle(fwd_bwd_throttle=-1,left_right_throttle=1,rotate_throttle=0)
-        print("Moving Backward-Left")
-    elif fwd_bwd_throttle == 0.999969482421875 and left_right_throttle == 0.999969482421875:
-        #merlin_bot.set_velocity_throttle(fwd_bwd_throttle=-1,left_right_throttle=-1,rotate_throttle=0)
-        print("Moving Backward-Right")
-    elif fwd_bwd_throttle == -1.0:
-        #merlin_bot.set_velocity_throttle(fwd_bwd_throttle=1,left_right_throttle=0,rotate_throttle=0)
-        print("Moving Forward")
-    elif fwd_bwd_throttle == 0.999969482421875:
-        #merlin_bot.set_velocity_throttle(fwd_bwd_throttle=-1,left_right_throttle=0,rotate_throttle=0)
-        print("Moving Backward")
-    elif left_right_throttle == -1.0:
-        #merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0,left_right_throttle=1,rotate_throttle=0)
-        print("Moving Left")
-    elif left_right_throttle == 0.999969482421875:
-        #merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0,left_right_throttle=-1,rotate_throttle=0)
-        print("Moving Right")
-    elif buttons[4] == 1:
-        print("Rotating Left")
-        # merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0,left_right_throttle=0,rotate_throttle=1)
-    elif buttons[5] == 1:
-        print("Rotating Right")
-        # merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0,left_right_throttle=0,rotate_throttle=-1)
-    elif buttons[0] == 1:
-        print("0R")
-    elif buttons[2] == 1:
-        print("0R")
-    elif buttons[1] == 1:
-        print("1R")
-    elif buttons[3] == 1:
-        print("1R")
-    elif buttons[6] == 1:
-        print("2R")
-    elif buttons[7] == 1:
-        print("2R")
-    elif buttons[9] == 1:
-        print("gripper open")
-    elif buttons[10] == 1:
-        print("gripper close")
-    else:
-        #merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0,left_right_throttle=0,rotate_throttle=0)
-        pass
+        rospy.init_node('button_action_handler')
+        rospy.Subscriber('/ps4_controller', Joy, self.joy_callback)
 
-    
-    # Command the robot to move
-      #merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0,left_right_throttle=0,rotate_throttle=0) #range -1 to 1
-      #merlin_bot.set_joint_pos(joint0_val=0, joint1_val=0,joint2_val=0,joint3_val=0)  #range -89 to 89
+    def joy_callback(self, msg):
+        # Update button states (buttons 1-10)
+        for i in range(min(len(msg.buttons), 10)):
+            self.button_states[i] = msg.buttons[i] == 1
+
+    def run(self):
+        rate = rospy.Rate(10)  # 10 Hz
+        while not rospy.is_shutdown():
+            # Example: Handle Button 5 (index 4)
+            if self.button_states[4]:
+                # Loop WHILE button is pressed
+                while self.button_states[4] and not rospy.is_shutdown():
+                    print("Button 5: Continuous action while pressed")
+                    # rate.sleep()
+                    # Re-check button state to exit loop when released
+                    if not self.button_states[4]:
+                        print("Button 5: released")
+                        # merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0,left_right_throttle=0,rotate_throttle=-1)
+                        break
+
+            # rate.sleep()
 
 if __name__ == '__main__':
-    rospy.init_node('ps4_controller_listener', anonymous=True)    
-    rospy.Subscriber('/ps4_controller', Joy, joy_callback)
-    print("Received joystick input, pls move joystick to start")
-    
     try:
-        rospy.spin()
+        handler = ButtonActionHandler()
+        handler.run()
     except rospy.ROSInterruptException:
         pass
