@@ -21,12 +21,12 @@ class ButtonActionHandler:
         merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0, left_right_throttle=0, rotate_throttle=0)
 
     def run(self):
-        rate = rospy.Rate(100)
+        # rate = rospy.Rate(100)
         while not rospy.is_shutdown():
             
             # Rotating left
             if self.button_states[4]:
-                while self.button_states[4] and not rospy.is_shutdown():
+                while self.button_states[4]:
                     print("Button index 4 pressed: Rotating left")
                     merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0, left_right_throttle=0, rotate_throttle=-1)
                     if not self.button_states[4]:
@@ -36,7 +36,7 @@ class ButtonActionHandler:
                     
             # Rotating right
             if self.button_states[5]:
-                while self.button_states[5] and not rospy.is_shutdown():
+                while self.button_states[5]:
                     print("Button index 5 pressed: Rotating right")
                     merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0, left_right_throttle=0, rotate_throttle=1)
                     if not self.button_states[5]:
@@ -46,7 +46,7 @@ class ButtonActionHandler:
 
             # fwd
             if self.button_states[6]:
-                while self.button_states[6] and not rospy.is_shutdown():
+                while self.button_states[6]:
                     print("Button index 6 pressed: Rotating right")
                     merlin_bot.set_velocity_throttle(fwd_bwd_throttle=1, left_right_throttle=0, rotate_throttle=0)
                     if not self.button_states[6]:
@@ -56,7 +56,7 @@ class ButtonActionHandler:
 
             # bwd
             if self.button_states[7]:
-                while self.button_states[7] and not rospy.is_shutdown():
+                while self.button_states[7]:
                     print("Button index 7 pressed: Rotating right")
                     merlin_bot.set_velocity_throttle(fwd_bwd_throttle=-1, left_right_throttle=0, rotate_throttle=0)
                     if not self.button_states[7]:
@@ -66,7 +66,7 @@ class ButtonActionHandler:
 
             # left
             if self.button_states[3]:
-                while self.button_states[3] and not rospy.is_shutdown():
+                while self.button_states[3]:
                     print("Button index 3 pressed: Rotating right")
                     merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0, left_right_throttle=1, rotate_throttle=0)
                     if not self.button_states[3]:
@@ -76,7 +76,7 @@ class ButtonActionHandler:
 
             # right
             if self.button_states[1]:
-                while self.button_states[1] and not rospy.is_shutdown():
+                while self.button_states[1]:
                     print("Button index 1 pressed: Rotating right")
                     merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0, left_right_throttle=-1, rotate_throttle=0)
                     if not self.button_states[1]:
@@ -84,7 +84,7 @@ class ButtonActionHandler:
                         self.robot_shutdown()
                         break
 
-            rate.sleep()
+            # rate.sleep()
 
 if __name__ == '__main__':
     try:
