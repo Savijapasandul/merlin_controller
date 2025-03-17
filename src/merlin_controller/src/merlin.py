@@ -22,19 +22,19 @@ class ButtonActionHandler:
             self.button_states[i] = msg.buttons[i] == 1
 
     def run(self):
-        rate = rospy.Rate(10)  # 10 Hz
+        
         while not rospy.is_shutdown():
-            # Example: Handle Button 5 (index 4)
+            
+            # Rotating left
             if self.button_states[4]:
-                # Loop WHILE button is pressed
                 while self.button_states[4] and not rospy.is_shutdown():
                     print("Button 5: Continuous action while pressed")
-                    # rate.sleep()
-                    # Re-check button state to exit loop when released
                     if not self.button_states[4]:
                         print("Button 5: released")
                         # merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0,left_right_throttle=0,rotate_throttle=-1)
                         break
+
+
 
             # rate.sleep()
 
