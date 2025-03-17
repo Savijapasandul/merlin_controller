@@ -18,7 +18,7 @@ class ButtonActionHandler:
             self.button_states[i] = msg.buttons[i] == 1
 
     def run(self):
-        
+        rate = rospy.Rate(10)
         while not rospy.is_shutdown():
             
             # Rotating left
@@ -40,7 +40,7 @@ class ButtonActionHandler:
                         print("Button 5 released: Stopped rotating right")
                         merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0,left_right_throttle=0,rotate_throttle=0)
                         break
-
+            rate.sleep()
 
 if __name__ == '__main__':
     try:
