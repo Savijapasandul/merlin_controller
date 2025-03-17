@@ -17,72 +17,69 @@ class ButtonActionHandler:
         for i in range(min(len(msg.buttons), 10)):
             self.button_states[i] = msg.buttons[i] == 1
     
-    def robot_shutdown(self):
-        merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0, left_right_throttle=0, rotate_throttle=0)
-
     def run(self):
         # rate = rospy.Rate(100)
         while not rospy.is_shutdown():
             
             # Rotating left
             if self.button_states[4]:
-                while self.button_states[4]:
-                    print("Button index 4 pressed: Rotating left")
-                    merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0, left_right_throttle=0, rotate_throttle=-1)
-                    if not self.button_states[4]:
-                        print("Button 4 released: Stopped rotating left")
-                        self.robot_shutdown()
-                        break
-                    
+                # while self.button_states[4]:
+                #     print("Button index 4 pressed: Rotating left")
+                merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0, left_right_throttle=0, rotate_throttle=-1)
+                if not self.button_states[4]:
+                    print("Button 4 released: Stopped rotating left")
+                    merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0, left_right_throttle=0, rotate_throttle=0)
+                    break
+                
             # Rotating right
             if self.button_states[5]:
-                while self.button_states[5]:
-                    print("Button index 5 pressed: Rotating right")
-                    merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0, left_right_throttle=0, rotate_throttle=1)
-                    if not self.button_states[5]:
-                        print("Button 5 released: Stopped rotating right")
-                        self.robot_shutdown()
-                        break
+                # while self.button_states[5]:
+                #     print("Button index 5 pressed: Rotating right")
+                merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0, left_right_throttle=0, rotate_throttle=1)
+                if not self.button_states[5]:
+                    print("Button 5 released: Stopped rotating right")
+                    merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0, left_right_throttle=0, rotate_throttle=0)
+                    break
 
             # fwd
             if self.button_states[6]:
-                while self.button_states[6]:
-                    print("Button index 6 pressed: Rotating right")
-                    merlin_bot.set_velocity_throttle(fwd_bwd_throttle=1, left_right_throttle=0, rotate_throttle=0)
-                    if not self.button_states[6]:
-                        print("Button 6 released: Stopped rotating right")
-                        self.robot_shutdown()
-                        break
+                # while self.button_states[6]:
+                #     print("Button index 6 pressed: Rotating right")
+                merlin_bot.set_velocity_throttle(fwd_bwd_throttle=-1, left_right_throttle=0, rotate_throttle=0)
+                if not self.button_states[6]:
+                    print("Button 6 released: Stopped rotating right")
+                    merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0, left_right_throttle=0, rotate_throttle=0)
+                    break
 
             # bwd
             if self.button_states[7]:
-                while self.button_states[7]:
-                    print("Button index 7 pressed: Rotating right")
-                    merlin_bot.set_velocity_throttle(fwd_bwd_throttle=-1, left_right_throttle=0, rotate_throttle=0)
-                    if not self.button_states[7]:
-                        print("Button 7 released: Stopped rotating right")
-                        self.robot_shutdown()
-                        break
+                # while self.button_states[7]:
+                #     print("Button index 7 pressed: Rotating right")
+                merlin_bot.set_velocity_throttle(fwd_bwd_throttle=1, left_right_throttle=0, rotate_throttle=0)
+                if not self.button_states[7]:
+                    print("Button 7 released: Stopped rotating right")
+                    merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0, left_right_throttle=0, rotate_throttle=0)
+                    break
 
             # left
             if self.button_states[3]:
-                while self.button_states[3]:
-                    print("Button index 3 pressed: Rotating right")
-                    merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0, left_right_throttle=1, rotate_throttle=0)
-                    if not self.button_states[3]:
-                        print("Button 3 released: Stopped rotating right")
-                        self.robot_shutdown()
-                        break
+                # while self.button_states[3]:
+                #     print("Button index 3 pressed: Rotating right")
+                merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0, left_right_throttle=-1, rotate_throttle=0)
+                if not self.button_states[3]:
+                    print("Button 3 released: Stopped rotating right")
+                    merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0, left_right_throttle=0, rotate_throttle=0)
+                    break
 
             # right
             if self.button_states[1]:
-                while self.button_states[1]:
-                    print("Button index 1 pressed: Rotating right")
-                    merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0, left_right_throttle=-1, rotate_throttle=0)
-                    if not self.button_states[1]:
-                        print("Button 1 released: Stopped rotating right")
-                        self.robot_shutdown()
-                        break
+                # while self.button_states[1]:
+                #     print("Button index 1 pressed: Rotating right")
+                merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0, left_right_throttle=1, rotate_throttle=0)
+                if not self.button_states[1]:
+                    print("Button 1 released: Stopped rotating right")
+                    merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0, left_right_throttle=0, rotate_throttle=0)
+                    break
 
             # rate.sleep()
 
