@@ -5,6 +5,8 @@ import merlin_hw
 merlin_bot = merlin_hw.robot()
 merlin_bot.start()
 
+merlin_bot.set_joint_pos(joint0_val=0, joint1_val=0,joint2_val=50,joint3_val=0)
+
 # Path to the joystick device
 device_path = "/dev/input/js0"
 
@@ -67,44 +69,40 @@ def handle_button_command(button_name, state):
             
         else:
             print(f"{button_name} pressed, but no action defined")
+    elif state == "Released":
+        # Stop the robot when any button is released
+        print(f"{button_name} released: Stopping robot")
+        merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0, left_right_throttle=0, rotate_throttle=0)            
 
 try:
     while True:
-        # Read an event from the joystick
         event = joystick.read(EVENT_SIZE)
         if event:
-            # Unpack the event data
             (time_val, value, event_type, number) = struct.unpack(EVENT_FORMAT, event)
-
-            # Handle button events
             if event_type == 1:
                 button_name = button_map.get(number, f"Unknown Button {number}")
                 state = "Pressed" if value == 1 else "Released"
                 print(f"Time: {time_val}, {button_name} {state}")
                 handle_button_command(button_name, state)
-
-            # Handle axis events
             elif event_type == 2:
                 axis_name = axis_map.get(number, f"Unknown Axis {number}")
-
                 if number == 0:  # X-Axis (Left/Right)
                     if value == -32767:
                         print(f"Time: {time_val}, Left")
-                        merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0, left_right_throttle=1, rotate_throttle=0)
+                        merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0, left_right_throttle=-1, rotate_throttle=0)
                     elif value == 32767:
                         print(f"Time: {time_val}, Right")
-                        merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0, left_right_throttle=-1, rotate_throttle=0)
+                        merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0, left_right_throttle=1, rotate_throttle=0)
                     elif value == 0:
                         print(f"Time: {time_val}, X-Axis Centered")
                         merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0, left_right_throttle=0, rotate_throttle=0)
-
                 elif number == 1:  # Y-Axis (Forward/Backward)
                     if value == -32767:
                         print(f"Time: {time_val}, Forward")
-                        merlin_bot.set_velocity_throttle(fwd_bwd_throttle=1, left_right_throttle=0, rotate_throttle=0)
+                        merlin_bot.set_velocity_throttle(fwd_bwd_throttle=-1, left_right_throttle=0, rotate_throttle=0)
                     elif value == 32767:
                         print(f"Time: {time_val}, Backward")
-                        merlin_bot.set_velocity_throttle(fwd_bwd_throttle=-1, left_right_throttle=0, rotate_throttle=0)
+                        merlin_bot.set_velocity_throttle(fwd_bwd_throttle=1, left_right_throttle=0, rotate_throttle=0)
                     elif value == 0:
                         print(f"Time: {time_val}, Y-Axis Centered")
                         merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0, left_right_throttle=0, rotate_throttle=0)
@@ -112,5 +110,7 @@ try:
 except KeyboardInterrupt:
     print("Exiting...")
 finally:
-    # Close the joystick device
     joystick.close()
+    merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0, left_right_throttle=0, rotate_throttle=0)
+    merlin_bot.set_joint_pos(joint0_val=0, joint1_val=0,joint2_val=50,joint3_val=0)
+    
