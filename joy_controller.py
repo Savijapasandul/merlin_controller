@@ -5,7 +5,8 @@ import merlin_hw
 merlin_bot = merlin_hw.robot()
 merlin_bot.start()
 
-merlin_bot.set_joint_pos(joint0_val=0, joint1_val=0,joint2_val=50,joint3_val=0)
+# Set initial positions for all servos
+merlin_bot.set_joint_pos(joint0_val=0, joint1_val=0, joint2_val=0, joint3_val=0)
 
 # Path to the joystick device
 device_path = "/dev/input/js0"
@@ -40,77 +41,100 @@ axis_map = {
     1: "Y-Axis (Forward/Backward)",
 }
 
+# Variables to store servo positions
+servo_positions = [0, 0, 0, 0]  # Initial positions for four servos
+stationary_mode = False  # Flag to indicate stationary mode
+selected_servo = 0  # Index of the currently selected servo (0 to 3)
+
 # Function to handle button commands
 def handle_button_command(button_name, state):
+    global servo_positions, stationary_mode, selected_servo
+
     if state == "Pressed":
-        if button_name == "Button A":
-            print("Button A: Starting robot")
-            
+        if button_name == "Button Y":
+            print("Button Y: Entering stationary mode")
+            stationary_mode = True
+            # Stop the robot's movement
+            merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0, left_right_throttle=0, rotate_throttle=0)
+        
+        elif button_name == "L2":
+            if stationary_mode:
+                # Decrease the selected servo's position by 10 (clamped to -89)
+                servo_positions[selected_servo] = max(-89, servo_positions[selected_servo] - 10)
+                print(f"L2: Servo {selected_servo} position decreased to {servo_positions[selected_servo]}")
+                # Update the servo motor positions
+                merlin_bot.set_joint_pos(joint0_val=servo_positions[0], joint1_val=servo_positions[1], joint2_val=servo_positions[2], joint3_val=servo_positions[3])
+        
+        elif button_name == "R2":
+            if stationary_mode:
+                # Increase the selected servo's position by 10 (clamped to 89)
+                servo_positions[selected_servo] = min(89, servo_positions[selected_servo] + 10)
+                print(f"R2: Servo {selected_servo} position increased to {servo_positions[selected_servo]}")
+                # Update the servo motor positions
+                merlin_bot.set_joint_pos(joint0_val=servo_positions[0], joint1_val=servo_positions[1], joint2_val=servo_positions[2], joint3_val=servo_positions[3])
+        
         elif button_name == "Button B":
-            print("Button B: Stopping robot")
-            
+            print("Button B: Exiting stationary mode")
+            stationary_mode = False
+            # Reset all servo positions to 0
+            servo_positions = [0, 0, 0, 0]
+            merlin_bot.set_joint_pos(joint0_val=0, joint1_val=0, joint2_val=0, joint3_val=0)
+        
         elif button_name == "Button X":
-            print("Button X: Rotating left")
-            
-        elif button_name == "Button Y":
-            print("Button Y: Rotating right")
-            
-        elif button_name == "L1":
-            print("L1: Rotating left")
-            merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0, left_right_throttle=0, rotate_throttle=1)
-        elif button_name == "R1":
-            print("R1: Rotating right")
-            merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0, left_right_throttle=0, rotate_throttle=-1)
-        elif button_name == "Start":
-            print("Start: Resetting robot")
-            
-        elif button_name == "Select":
-            print("Select: Toggle mode")
-            
+            if stationary_mode:
+                # Cycle to the next servo
+                selected_servo = (selected_servo + 1) % 4
+                print(f"Button X: Selected Servo {selected_servo}")
+        
+        elif button_name == "Button A":
+            if stationary_mode:
+                # Cycle to the previous servo
+                selected_servo = (selected_servo - 1) % 4
+                print(f"Button A: Selected Servo {selected_servo}")
+        
         else:
             print(f"{button_name} pressed, but no action defined")
+    
     elif state == "Released":
-        # Stop the robot when any button is released
-        print(f"{button_name} released: Stopping robot")
-        merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0, left_right_throttle=0, rotate_throttle=0)            
+        print(f"{button_name} released")
 
 try:
     while True:
         event = joystick.read(EVENT_SIZE)
         if event:
             (time_val, value, event_type, number) = struct.unpack(EVENT_FORMAT, event)
-            if event_type == 1:
+            if event_type == 1:  # Button event
                 button_name = button_map.get(number, f"Unknown Button {number}")
                 state = "Pressed" if value == 1 else "Released"
                 print(f"Time: {time_val}, {button_name} {state}")
                 handle_button_command(button_name, state)
-            elif event_type == 2:
+            elif event_type == 2:  # Axis event
                 axis_name = axis_map.get(number, f"Unknown Axis {number}")
-                if number == 0:  # X-Axis (Left/Right)
-                    if value == -32767:
-                        print(f"Time: {time_val}, Left")
-                        merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0, left_right_throttle=-1, rotate_throttle=0)
-                    elif value == 32767:
-                        print(f"Time: {time_val}, Right")
-                        merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0, left_right_throttle=1, rotate_throttle=0)
-                    elif value == 0:
-                        print(f"Time: {time_val}, X-Axis Centered")
-                        merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0, left_right_throttle=0, rotate_throttle=0)
-                elif number == 1:  # Y-Axis (Forward/Backward)
-                    if value == -32767:
-                        print(f"Time: {time_val}, Forward")
-                        merlin_bot.set_velocity_throttle(fwd_bwd_throttle=-1, left_right_throttle=0, rotate_throttle=0)
-                    elif value == 32767:
-                        print(f"Time: {time_val}, Backward")
-                        merlin_bot.set_velocity_throttle(fwd_bwd_throttle=1, left_right_throttle=0, rotate_throttle=0)
-                    elif value == 0:
-                        print(f"Time: {time_val}, Y-Axis Centered")
-                        merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0, left_right_throttle=0, rotate_throttle=0)
+                if not stationary_mode:  # Only process axis events if not in stationary mode
+                    if number == 0:  # X-Axis (Left/Right)
+                        if value == -32767:
+                            print(f"Time: {time_val}, Left")
+                            merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0, left_right_throttle=-1, rotate_throttle=0)
+                        elif value == 32767:
+                            print(f"Time: {time_val}, Right")
+                            merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0, left_right_throttle=1, rotate_throttle=0)
+                        elif value == 0:
+                            print(f"Time: {time_val}, X-Axis Centered")
+                            merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0, left_right_throttle=0, rotate_throttle=0)
+                    elif number == 1:  # Y-Axis (Forward/Backward)
+                        if value == -32767:
+                            print(f"Time: {time_val}, Forward")
+                            merlin_bot.set_velocity_throttle(fwd_bwd_throttle=-1, left_right_throttle=0, rotate_throttle=0)
+                        elif value == 32767:
+                            print(f"Time: {time_val}, Backward")
+                            merlin_bot.set_velocity_throttle(fwd_bwd_throttle=1, left_right_throttle=0, rotate_throttle=0)
+                        elif value == 0:
+                            print(f"Time: {time_val}, Y-Axis Centered")
+                            merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0, left_right_throttle=0, rotate_throttle=0)
 
 except KeyboardInterrupt:
     print("Exiting...")
 finally:
     joystick.close()
     merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0, left_right_throttle=0, rotate_throttle=0)
-    merlin_bot.set_joint_pos(joint0_val=0, joint1_val=0,joint2_val=50,joint3_val=0)
-    
+    merlin_bot.set_joint_pos(joint0_val=0, joint1_val=0, joint2_val=0, joint3_val=0)
