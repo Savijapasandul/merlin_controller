@@ -58,20 +58,28 @@ def handle_button_command(button_name, state):
             merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0, left_right_throttle=0, rotate_throttle=0)
         
         elif button_name == "L2":
-            if stationary_mode:
-                # Decrease the selected servo's position by 10 (clamped to -89)
-                servo_positions[selected_servo] = max(-89, servo_positions[selected_servo] - 10)
-                print(f"L2: Servo {selected_servo} position decreased to {servo_positions[selected_servo]}")
-                # Update the servo motor positions
-                merlin_bot.set_joint_pos(joint0_val=servo_positions[0], joint1_val=servo_positions[1], joint2_val=servo_positions[2], joint3_val=servo_positions[3])
-        
+            if stationary_mode and state == "Pressed":
+            # Continuously decrease the selected servo's position while pressed
+                while True:
+                    servo_positions[selected_servo] = max(-89, servo_positions[selected_servo] - 1)
+                    print(f"L2: Servo {selected_servo} position decreased to {servo_positions[selected_servo]}")
+                    merlin_bot.set_joint_pos(joint0_val=servo_positions[0], joint1_val=servo_positions[1], joint2_val=servo_positions[2], joint3_val=servo_positions[3])
+                    event = joystick.read(EVENT_SIZE)
+                    (time_val, value, event_type, number) = struct.unpack(EVENT_FORMAT, event)
+                    if event_type == 1 and number == 6 and value == 0:  # L2 Released
+                        break
+
         elif button_name == "R2":
-            if stationary_mode:
-                # Increase the selected servo's position by 10 (clamped to 89)
-                servo_positions[selected_servo] = min(89, servo_positions[selected_servo] + 10)
-                print(f"R2: Servo {selected_servo} position increased to {servo_positions[selected_servo]}")
-                # Update the servo motor positions
-                merlin_bot.set_joint_pos(joint0_val=servo_positions[0], joint1_val=servo_positions[1], joint2_val=servo_positions[2], joint3_val=servo_positions[3])
+            if stationary_mode and state == "Pressed":
+            # Continuously increase the selected servo's position while pressed
+                while True:
+                    servo_positions[selected_servo] = min(89, servo_positions[selected_servo] + 1)
+                    print(f"R2: Servo {selected_servo} position increased to {servo_positions[selected_servo]}")
+                    merlin_bot.set_joint_pos(joint0_val=servo_positions[0], joint1_val=servo_positions[1], joint2_val=servo_positions[2], joint3_val=servo_positions[3])
+                    event = joystick.read(EVENT_SIZE)
+                    (time_val, value, event_type, number) = struct.unpack(EVENT_FORMAT, event)
+                    if event_type == 1 and number == 7 and value == 0:  # R2 Released
+                        break
         
         elif button_name == "Button B":
             print("Button B: Exiting stationary mode")
