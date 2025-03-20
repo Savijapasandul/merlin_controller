@@ -2,6 +2,23 @@
 # Author: Savija Pasandul
 # Last updated: 2021-08-10
 
+# Instructions for the script:
+
+# 1. Ensure the `merlin_hw` module is installed and accessible in your Python environment.
+# 2. Connect the joystick to your system and verify its device path (default is `/dev/input/js0`).
+# 3. Run the script to initialize the robot and start listening for joystick inputs.
+# 4. Use the joystick buttons to control the robot:
+#    - "Start" button toggles the program's running state.
+#    - "Home" button exits the program.
+#    - "Button Y", "Button B", "Button A", and "Button X" control movement (forward, right, backward, left).
+#    - "L1" and "R1" control rotation (left and right).
+#    - "L2" and "R2" switch between servo modes 1 and 2.
+# 5. Use the joystick axes to adjust servo positions in the selected servo mode:
+#    - Servo mode 1: Adjusts servo 0 (X-Axis) and servo 1 (Y-Axis).
+#    - Servo mode 2: Adjusts servo 2 (X-Axis) and servo 3 (Y-Axis).
+# 6. Press "Home" or use Ctrl+C to safely exit the program.
+# 7. Upon exit, the robot's velocity and joint positions are reset to their initial states.
+
 import struct
 import merlin_hw
 
