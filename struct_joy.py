@@ -1,12 +1,12 @@
 import struct
 import merlin_hw
 
-# # Initialize the robot
-# merlin_bot = merlin_hw.robot()
-# merlin_bot.start()
+# Initialize the robot
+merlin_bot = merlin_hw.robot()
+merlin_bot.start()
 
-# # Set the initial position of the robot's arm
-# merlin_bot.set_joint_pos(joint0_val=0, joint1_val=0, joint2_val=89, joint3_val=0)
+# Set the initial position of the robot's arm
+merlin_bot.set_joint_pos(joint0_val=0, joint1_val=0, joint2_val=89, joint3_val=0)
 
 # Path to the joystick device
 device_path = "/dev/input/js0"
@@ -35,9 +35,112 @@ button_map = {
     12: "Home",
 }
 
-# Mapping for axes and directions
+# Mapping for axes
 axis_map = {
-    0: "X-Axis (Left/Right)",
-    1: "Y-Axis (Forward/Backward)",
+    0: "X-Axis",
+    1: "Y-Axis",
 }
 
+# Variables
+servo_positions = [0, 0, 89, 0]  # Initial positions for four servos
+servo_mode = None  # None, 1, or 2
+program_running = False  # Toggle for Start button
+exit_program = False  # Toggle for Home button
+
+# Function to handle button commands
+def handle_button_command(button_name, state):
+    global servo_mode, program_running, exit_program
+
+    if state == "Pressed":
+        if button_name == "Start":
+            program_running = not program_running
+            print("Program started" if program_running else "Program stopped")
+
+        elif button_name == "Home":
+            exit_program = True
+            print("Exiting program...")
+            exit()
+
+        elif program_running:
+            if button_name == "Button Y":
+                print("Moving forward")
+                merlin_bot.set_velocity_throttle(fwd_bwd_throttle=-1, left_right_throttle=0, rotate_throttle=0)
+
+            elif button_name == "Button B":
+                print("Moving right")
+                merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0, left_right_throttle=1, rotate_throttle=0)
+
+            elif button_name == "Button A":
+                print("Moving backward")
+                merlin_bot.set_velocity_throttle(fwd_bwd_throttle=1, left_right_throttle=0, rotate_throttle=0)
+
+            elif button_name == "Button X":
+                print("Moving left")
+                merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0, left_right_throttle=-1, rotate_throttle=0)
+
+            elif button_name == "L1":
+                print("Rotating left")
+                merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0, left_right_throttle=0, rotate_throttle=1)
+
+            elif button_name == "R1":
+                print("Rotating right")
+                merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0, left_right_throttle=0, rotate_throttle=-1)
+
+            elif button_name == "L2":
+                servo_mode = 1
+                print("Servo mode 1 selected")
+
+            elif button_name == "R2":
+                servo_mode = 2
+                print("Servo mode 2 selected")
+
+    elif state == "Released":
+        if button_name in ["Button Y", "Button B", "Button A", "Button X", "L1", "R1"]:
+            merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0, left_right_throttle=0, rotate_throttle=0)
+
+# Function to handle axis commands
+def handle_axis_command(axis_name, value):
+    global servo_positions, servo_mode
+
+    if servo_mode == 1:
+        if axis_name == "X-Axis":
+            servo_positions[0] = max(-89, min(89, servo_positions[0] + (5 if value > 0 else -5)))
+            print(f"Servo 0 position: {servo_positions[0]}")
+        elif axis_name == "Y-Axis":
+            servo_positions[1] = max(-89, min(89, servo_positions[1] + (5 if value > 0 else -5)))
+            print(f"Servo 1 position: {servo_positions[1]}")
+
+    elif servo_mode == 2:
+        if axis_name == "X-Axis":
+            servo_positions[2] = max(-89, min(89, servo_positions[2] + (5 if value > 0 else -5)))
+            print(f"Servo 2 position: {servo_positions[2]}")
+        elif axis_name == "Y-Axis":
+            servo_positions[3] = max(-89, min(89, servo_positions[3] + (5 if value > 0 else -5)))
+            print(f"Servo 3 position: {servo_positions[3]}")
+
+    merlin_bot.set_joint_pos(joint0_val=servo_positions[0], joint1_val=servo_positions[1],
+                             joint2_val=servo_positions[2], joint3_val=servo_positions[3])
+
+# Main loop
+try:
+    while not exit_program:
+        event = joystick.read(EVENT_SIZE)
+        if event:
+            time_val, value, event_type, number = struct.unpack(EVENT_FORMAT, event)
+
+            if event_type == 1:  # Button event
+                button_name = button_map.get(number, f"Unknown Button {number}")
+                state = "Pressed" if value == 1 else "Released"
+                handle_button_command(button_name, state)
+
+            elif event_type == 2:  # Axis event
+                axis_name = axis_map.get(number, f"Unknown Axis {number}")
+                if program_running and servo_mode:
+                    handle_axis_command(axis_name, value)
+
+except KeyboardInterrupt:
+    print("Exiting...")
+finally:
+    joystick.close()
+    merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0, left_right_throttle=0, rotate_throttle=0)
+    merlin_bot.set_joint_pos(joint0_val=0, joint1_val=0, joint2_val=89, joint3_val=0)
