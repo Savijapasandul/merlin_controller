@@ -138,25 +138,25 @@ try:
                         elif value == 0:
                             print(f"Time: {time_val}, Y-Axis Centered")
                             merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0, left_right_throttle=0, rotate_throttle=0)                     
-                    elif number in (0, 1):  # Handle diagonal movement
-                        if axis_map.get(0) and axis_map.get(1):
-                            if value == -32767:
-                                if number == 0:  # Left
-                                    print(f"Time: {time_val}, Diagonal Forward-Left")
-                                    merlin_bot.set_velocity_throttle(fwd_bwd_throttle=-1, left_right_throttle=-1, rotate_throttle=0)
-                                elif number == 1:  # Forward
-                                    print(f"Time: {time_val}, Diagonal Forward-Left")
-                                    merlin_bot.set_velocity_throttle(fwd_bwd_throttle=-1, left_right_throttle=-1, rotate_throttle=0)
-                            elif value == 32767:
-                                if number == 0:  # Right
-                                    print(f"Time: {time_val}, Diagonal Forward-Right")
-                                    merlin_bot.set_velocity_throttle(fwd_bwd_throttle=-1, left_right_throttle=1, rotate_throttle=0)
-                                elif number == 1:  # Backward
-                                    print(f"Time: {time_val}, Diagonal Backward-Right")
-                                    merlin_bot.set_velocity_throttle(fwd_bwd_throttle=1, left_right_throttle=1, rotate_throttle=0)
-                            elif value == 0:
-                                print(f"Time: {time_val}, Diagonal Centered")
-                                merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0, left_right_throttle=0, rotate_throttle=0)
+                    # elif number in (0, 1):  # Handle diagonal movement
+                    #     if axis_map.get(0) and axis_map.get(1):
+                    #         if value == -32767:
+                    #             if number == 0:  # Left
+                    #                 print(f"Time: {time_val}, Diagonal Forward-Left")
+                    #                 merlin_bot.set_velocity_throttle(fwd_bwd_throttle=-1, left_right_throttle=-1, rotate_throttle=0)
+                    #             elif number == 1:  # Forward
+                    #                 print(f"Time: {time_val}, Diagonal Forward-Left")
+                    #                 merlin_bot.set_velocity_throttle(fwd_bwd_throttle=-1, left_right_throttle=-1, rotate_throttle=0)
+                    #         elif value == 32767:
+                    #             if number == 0:  # Right
+                    #                 print(f"Time: {time_val}, Diagonal Forward-Right")
+                    #                 merlin_bot.set_velocity_throttle(fwd_bwd_throttle=-1, left_right_throttle=1, rotate_throttle=0)
+                    #             elif number == 1:  # Backward
+                    #                 print(f"Time: {time_val}, Diagonal Backward-Right")
+                    #                 merlin_bot.set_velocity_throttle(fwd_bwd_throttle=1, left_right_throttle=1, rotate_throttle=0)
+                    #         elif value == 0:
+                    #             print(f"Time: {time_val}, Diagonal Centered")
+                    #             merlin_bot.set_velocity_throttle(fwd_bwd_throttle=0, left_right_throttle=0, rotate_throttle=0)
 
 except KeyboardInterrupt:
     print("Exiting...")
