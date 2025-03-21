@@ -82,6 +82,12 @@ def handle_button_command(button_name, state):
             print("Exiting program...")
             exit()
 
+        elif button_name == "Select":
+            servo_positions = [0, 0, 89, 0]
+            merlin_bot.set_joint_pos(joint0_val=servo_positions[0], joint1_val=servo_positions[1],
+                         joint2_val=servo_positions[2], joint3_val=servo_positions[3])
+            print("Servos reset to original position")
+
         elif program_running:
             if button_name == "Button Y":
                 print("Moving forward")
