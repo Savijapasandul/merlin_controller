@@ -131,18 +131,30 @@ def handle_axis_command(axis_name, value):
 
     if servo_mode == 1:
         if axis_name == "X-Axis":
-            servo_positions[0] = max(-89, min(89, servo_positions[0] + (5 if value > 0 else -5)))
+            if value > 20000:  # Joystick pushed to the right
+                servo_positions[0] = max(-89, min(89, servo_positions[0] + 1))
+            elif value < -20000:  # Joystick pushed to the left
+                servo_positions[0] = max(-89, min(89, servo_positions[0] - 1))
             print(f"Servo 0 position: {servo_positions[0]}")
         elif axis_name == "Y-Axis":
-            servo_positions[1] = max(-89, min(89, servo_positions[1] + (5 if value > 0 else -5)))
+            if value > 20000:  # Joystick pushed down
+                servo_positions[1] = max(-89, min(89, servo_positions[1] + 1))
+            elif value < -20000:  # Joystick pushed up
+                servo_positions[1] = max(-89, min(89, servo_positions[1] - 1))
             print(f"Servo 1 position: {servo_positions[1]}")
 
     elif servo_mode == 2:
         if axis_name == "X-Axis":
-            servo_positions[2] = max(-89, min(89, servo_positions[2] + (5 if value > 0 else -5)))
+            if value > 20000:  # Joystick pushed to the right
+                servo_positions[2] = max(-89, min(89, servo_positions[2] + 1))
+            elif value < -20000:  # Joystick pushed to the left
+                servo_positions[2] = max(-89, min(89, servo_positions[2] - 1))
             print(f"Servo 2 position: {servo_positions[2]}")
         elif axis_name == "Y-Axis":
-            servo_positions[3] = max(-89, min(89, servo_positions[3] + (5 if value > 0 else -5)))
+            if value > 20000:  # Joystick pushed down
+                servo_positions[3] = max(-89, min(89, servo_positions[3] + 1))
+            elif value < -20000:  # Joystick pushed up
+                servo_positions[3] = max(-89, min(89, servo_positions[3] - 1))
             print(f"Servo 3 position: {servo_positions[3]}")
 
     merlin_bot.set_joint_pos(joint0_val=servo_positions[0], joint1_val=servo_positions[1],
